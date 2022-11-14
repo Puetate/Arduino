@@ -16,8 +16,9 @@ void event(const char * payload, size_t length){
 }
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
 
+  Serial.setDebugOutput(true);
   //Connectar a Wifi
   WiFiMulti.addAP(ssid, password);
   Serial.println("Intentando conectar a wifi");
@@ -32,7 +33,7 @@ void setup() {
 
   //Recibir evento desde el Seridor
   webSocket.on("alert",event);
-  webSocket.begin("137.184.70.22",3000,"/");
+  webSocket.begin(HOST,3000);
 
 }
 
@@ -45,6 +46,6 @@ void loop() {
     Serial.println("Conexion perdida");
   } */
   webSocket.loop();
-  delay(4500);
+  delay(500);
 }
 

@@ -1,13 +1,14 @@
 #include <SocketIoClient.h>
 #include <WiFi.h>
+#include <WiFiMulti.h>
 
-
+WiFiMulti WiFiMulti;
 SocketIoClient webSocket;
 
 //CONST VARIABLES
-const char* ssid = "Claro_eeeeeeeee";
-const char* password = "44444444444";
-const char* HOST = "http://137.184.70.22";
+const char* ssid = "PuetaWifi";
+const char* password = "pueta@localhost:8080";
+const char* HOST = "137.184.70.22";
 
 //evento webSocket
 void event(const char * payload, size_t length){
@@ -18,29 +19,32 @@ void setup() {
   Serial.begin(115200);
 
   //Connectar a Wifi
-  WiFi.begin(ssid, password);
+  WiFiMulti.addAP(ssid, password);
   Serial.println("Intentando conectar a wifi");
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFiMulti.run()!= WL_CONNECTED) {
     Serial.println(".");
-    delay(500);
+    delay(2900);
   }
 
-  Serial.println("\nConeectado a la red");
+  Serial.println("\nConectado a la red");
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
   //Recibir evento desde el Seridor
   webSocket.on("alert",event);
-  webSocket.begin(HOST);
+  webSocket.begin("137.184.70.22",3000,"/");
+
 }
 
 void loop() {
-  if((WiFi.status() == WL_CONNECTED)){
+  /* if((WiFi.status() == WL_CONNECTED)){
     Serial.println("Ya existe conexion, intenta hacer ping.");
     delay(10000);
   }
   else{
     Serial.println("Conexion perdida");
-  }
+  } */
+  webSocket.loop();
+  delay(4500);
 }
 

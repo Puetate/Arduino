@@ -6,8 +6,11 @@
 #include <vector>
 #include <WebSocketsClient.h>
 
-#define SOCKETIOCLIENT_DEBUG(...) Serial.printf(__VA_ARGS__);
-//#define SOCKETIOCLIENT_DEBUG(...)
+#ifndef NODEBUG_SOCKETIOCLIENT
+   #define SOCKETIOCLIENT_DEBUG(...) Serial.printf(__VA_ARGS__);
+#else
+   #define SOCKETIOCLIENT_DEBUG(...)
+#endif
 
 #define PING_INTERVAL 10000 //TODO: use socket.io server response
 
@@ -37,6 +40,7 @@ public:
 	void loop();
 	void on(const char* event, std::function<void (const char * payload, size_t length)>);
 	void emit(const char* event, const char * payload = NULL);
+	void remove(const char* event);
 	void disconnect();
 	void setAuthorization(const char * user, const char * password);
 };

@@ -1,10 +1,9 @@
 #include <Arduino.h>
-#include <SocketIoClient.h>
 
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
 
-
+#include <SocketIoClient.h>
 
 #define USE_SERIAL Serial
 

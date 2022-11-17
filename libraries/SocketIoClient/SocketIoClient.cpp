@@ -15,21 +15,12 @@ const String getEventPayload(const String msg) {
 	return result;
 }
 
-static void hexdump(const uint32_t* src, size_t count) {
-    for (size_t i = 0; i < count; ++i) {
-        Serial.printf("%08x ", *src);
-        ++src;
-        if ((i + 1) % 4 == 0) {
-            Serial.printf("\n");
-        }
-    }
-}
-
 void SocketIoClient::webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 	String msg;
 	switch(type) {
 		case WStype_DISCONNECTED:
 			SOCKETIOCLIENT_DEBUG("[SIoC] Disconnected!\n");
+            trigger("disconnected", NULL, 0);
 			break;
 		case WStype_CONNECTED:
 			SOCKETIOCLIENT_DEBUG("[SIoC] Connected to url: %s\n",  payload);
@@ -42,19 +33,17 @@ void SocketIoClient::webSocketEvent(WStype_t type, uint8_t * payload, size_t len
 				_webSocket.sendTXT("3");
 			} else if(msg.startsWith("40")) {
 				trigger("connect", NULL, 0);
-			} else if(msg.startsWith("41")) {
-				trigger("disconnect", NULL, 0);
 			}
 			break;
 		case WStype_BIN:
 			SOCKETIOCLIENT_DEBUG("[SIoC] get binary length: %u\n", length);
-			hexdump((uint32_t*) payload, length);
+			//hexdump(payload, length);
 		break;
 	}
 }
 
 void SocketIoClient::beginSSL(const char* host, const int port, const char* url, const char* fingerprint) {
-	_webSocket.beginSSL(host, port, url, fingerprint);
+	_webSocket.beginSSL(host, port, url, fingerprint); 
     initialize();
 }
 
@@ -102,15 +91,6 @@ void SocketIoClient::emit(const char* event, const char * payload) {
 	_packets.push_back(msg);
 }
 
-void SocketIoClient::remove(const char* event) {
-	auto e = _events.find(event);
-	if(e != _events.end()) {
-		_events.erase(e);
-	} else {
-		SOCKETIOCLIENT_DEBUG("[SIoC] event %s not found, can not be removed", event);
-	}
-}
-
 void SocketIoClient::trigger(const char* event, const char * payload, size_t length) {
 	auto e = _events.find(event);
 	if(e != _events.end()) {
@@ -119,14 +99,4 @@ void SocketIoClient::trigger(const char* event, const char * payload, size_t len
 	} else {
 		SOCKETIOCLIENT_DEBUG("[SIoC] event %s not found. %d events available\n", event, _events.size());
 	}
-}
-
-void SocketIoClient::disconnect()
-{
-	_webSocket.disconnect();
-	trigger("disconnect", NULL, 0);
-}
-
-void SocketIoClient::setAuthorization(const char * user, const char * password) {
-    _webSocket.setAuthorization(user, password);
 }
